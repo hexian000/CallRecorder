@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">通话录音</string>
+    <string name="enable_call_record">启用通话录音</string>
+    <string name="no_permission">未获取权限。（是否已安装为系统app？）</string>
+</resources>
