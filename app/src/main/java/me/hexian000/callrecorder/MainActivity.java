@@ -20,7 +20,6 @@ public class MainActivity extends Activity {
 			"android.permission.RECORD_AUDIO",
 			"android.permission.PROCESS_OUTGOING_CALLS",
 			"android.permission.READ_PHONE_STATE",
-			"android.permission.READ_PHONE_NUMBERS",
 	};
 
 	@Override
