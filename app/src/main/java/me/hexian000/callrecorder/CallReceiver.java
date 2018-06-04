@@ -22,11 +22,7 @@ public class CallReceiver extends BroadcastReceiver {
 		final CallRecorder app = (CallRecorder) context.getApplicationContext();
 		final String number;
 		final boolean start;
-		if ("android.intent.action.NEW_OUTGOING_CALL".equals(intent.getAction())) {
-			number = intent.getStringExtra("android.intent.extra.PHONE_NUMBER");
-			Log.d(LOG_TAG, "NEW_OUTGOING_CALL " + number);
-			start = true;
-		} else if ("android.intent.action.PHONE_STATE".equals(intent.getAction())) {
+		if ("android.intent.action.PHONE_STATE".equals(intent.getAction())) {
 			final String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
 			number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
 			Log.d(LOG_TAG, "PHONE_STATE " + state + " " + number);
