@@ -19,6 +19,11 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "CallRecorder-${variant.versionName}.apk"
+        }
+    }
 }
 
 dependencies {
