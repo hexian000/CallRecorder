@@ -62,7 +62,25 @@ public class CallReceiver extends BroadcastReceiver {
 				Log.e(LOG_TAG, "MediaRecorder.prepare()", e);
 			}
 			Log.i(LOG_TAG, "start: " + file);
-			recorder.start();
+			for (int retry = 0; ; retry++) {
+				try {
+					recorder.start();
+					break;
+				} catch (Throwable ex) {
+					Log.e(LOG_TAG, "MediaRecorder.start()", ex);
+				}
+				if (retry < 3) {
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException ex) {
+						Log.w(LOG_TAG, "Thread.sleep()", ex);
+						return;
+					}
+				} else {
+					Log.e(LOG_TAG, "MediaRecorder.start() failed over 3 times");
+					return;
+				}
+			}
 			app.mediaRecorder = recorder;
 		} else {
 			if (app.mediaRecorder != null) {
