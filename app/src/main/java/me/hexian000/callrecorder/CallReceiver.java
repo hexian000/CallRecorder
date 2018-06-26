@@ -52,7 +52,7 @@ public class CallReceiver extends BroadcastReceiver {
 			}
 
 			final String file = dir.getAbsolutePath() + "/" +
-					new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.getDefault())
+					new SimpleDateFormat("yyyy-MM-dd'T'HH_mm_ss.SSSZZ", Locale.getDefault())
 							.format(new Date()) + "_" + number + ".aac";
 			recorder.setOutputFile(file);
 
