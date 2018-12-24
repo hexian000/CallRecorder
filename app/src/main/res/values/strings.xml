@@ -2,4 +2,5 @@
     <string name="app_name">Call Recorder</string>
     <string name="enable_call_record">Enable Call Record</string>
     <string name="no_permission">Permission is not granted. (are you installed as system app?)</string>
+    <string name="record_now">Record Now</string>
 </resources>

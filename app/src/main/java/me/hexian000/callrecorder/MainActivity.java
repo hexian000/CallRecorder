@@ -2,24 +2,39 @@ package me.hexian000.callrecorder;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
+import static me.hexian000.callrecorder.CallRecorder.LOG_TAG;
 
 public class MainActivity extends Activity {
 	private static final int PERMISSIONS_REQUEST_CODE = 0;
-	private static final String[] DESIRED_PERMISSIONS = new String[]{
+	private static final String[] CALL_RECORD_PERMISSIONS = new String[]{
 			"android.permission.CAPTURE_AUDIO_OUTPUT",
 			"android.permission.READ_PRIVILEGED_PHONE_STATE",
 			"android.permission.WRITE_EXTERNAL_STORAGE",
 			"android.permission.RECORD_AUDIO",
 			"android.permission.READ_PHONE_STATE",
 	};
+	private static final String[] RECORD_PERMISSIONS = new String[]{
+			"android.permission.WRITE_EXTERNAL_STORAGE",
+			"android.permission.RECORD_AUDIO",
+	};
+
+	private static MediaRecorder recorder = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +50,9 @@ public class MainActivity extends Activity {
 		final CallRecorder app = (CallRecorder) getApplicationContext();
 		final ToggleButton toggle = (ToggleButton) v;
 		if (toggle.isChecked()) {
-			grantPermissions(checkPermissions(DESIRED_PERMISSIONS));
+			grantPermissions(checkPermissions(CALL_RECORD_PERMISSIONS));
 
-			if (checkPermissions(DESIRED_PERMISSIONS).length > 0) {
+			if (checkPermissions(CALL_RECORD_PERMISSIONS).length > 0) {
 				toggle.setChecked(false);
 				Toast.makeText(this, R.string.no_permission, Toast.LENGTH_SHORT).show();
 				return;
@@ -46,6 +61,61 @@ public class MainActivity extends Activity {
 			app.setEnabled(true);
 		} else {
 			app.setEnabled(false);
+		}
+	}
+
+	public void ToggleRecord(View v) {
+		final ToggleButton toggle = (ToggleButton) v;
+		if (toggle.isChecked()) {
+			grantPermissions(checkPermissions(RECORD_PERMISSIONS));
+
+			if (checkPermissions(RECORD_PERMISSIONS).length > 0) {
+				toggle.setChecked(false);
+				Toast.makeText(this, R.string.no_permission, Toast.LENGTH_SHORT).show();
+				return;
+			}
+
+			recorder = new MediaRecorder();
+			recorder.setAudioChannels(1);
+			recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+			recorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
+			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+			recorder.setAudioSamplingRate(48000);
+			recorder.setAudioEncodingBitRate(192000);
+
+			File dir = new File(
+					Environment.getExternalStoragePublicDirectory(
+							Environment.DIRECTORY_MUSIC) + "/Recorder");
+			if (!dir.exists()) {
+				if (!dir.mkdirs()) {
+					Log.e(LOG_TAG, "cannot mkdirs: " + dir.getAbsolutePath());
+					return;
+				}
+			}
+
+			final String file = dir.getAbsolutePath() + "/" +
+					new SimpleDateFormat("yyyy-MM-dd'T'HH_mm_ss.SSSZZ", Locale.getDefault())
+							.format(new Date()) + ".aac";
+			recorder.setOutputFile(file);
+
+			try {
+				recorder.prepare();
+			} catch (IOException e) {
+				Log.e(LOG_TAG, "MediaRecorder.prepare()", e);
+			}
+			Log.i(LOG_TAG, "start: " + file);
+			try {
+				recorder.start();
+			} catch (Throwable ex) {
+				Log.e(LOG_TAG, "MediaRecorder.start()", ex);
+			}
+		} else {
+			if (recorder != null) {
+				recorder.stop();
+				recorder.release();
+				recorder = null;
+				Log.i(LOG_TAG, "stop");
+			}
 		}
 	}
 

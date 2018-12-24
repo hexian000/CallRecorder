@@ -6,8 +6,8 @@ android {
         applicationId "me.hexian000.callrecorder"
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 3
-        versionName "1.0.4"
+        versionCode 4
+        versionName "2.0.0"
     }
     buildTypes {
         release {
