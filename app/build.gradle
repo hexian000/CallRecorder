@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "me.hexian000.callrecorder"
-        minSdkVersion 24
+        minSdkVersion 26
         targetSdkVersion 28
         versionCode 4
         versionName "2.0.0"
@@ -12,6 +12,7 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -27,5 +28,5 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
 }
