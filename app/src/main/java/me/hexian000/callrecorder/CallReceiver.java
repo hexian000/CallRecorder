@@ -7,6 +7,7 @@ import android.media.MediaRecorder;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,13 +82,20 @@ public class CallReceiver extends BroadcastReceiver {
 					return;
 				}
 			}
+			Toast.makeText(context, R.string.record_begin, Toast.LENGTH_SHORT).show();
 			app.mediaRecorder = recorder;
+			app.writingFile = file;
 		} else {
 			if (app.mediaRecorder != null) {
 				app.mediaRecorder.stop();
 				app.mediaRecorder.release();
 				app.mediaRecorder = null;
 				Log.i(LOG_TAG, "stop");
+				final String toastText = String.format(Locale.getDefault(),
+						context.getResources().getString(R.string.record_end),
+						app.writingFile);
+				app.writingFile = null;
+				Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
 			}
 		}
 	}

@@ -10,6 +10,7 @@ import android.util.Log;
 public class CallRecorder extends Application {
 	public static final String LOG_TAG = CallRecorder.class.getSimpleName();
 	public MediaRecorder mediaRecorder = null;
+	public String writingFile = null;
 
 	public boolean isEnabled() {
 		final Context context = getApplicationContext();

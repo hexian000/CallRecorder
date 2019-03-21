@@ -35,6 +35,7 @@ public class MainActivity extends Activity {
 	};
 
 	private static MediaRecorder recorder = null;
+	private static String writingFile = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -109,12 +110,20 @@ public class MainActivity extends Activity {
 			} catch (Throwable ex) {
 				Log.e(LOG_TAG, "MediaRecorder.start()", ex);
 			}
+			writingFile = file;
+			Toast.makeText(this, R.string.record_begin, Toast.LENGTH_SHORT).show();
 		} else {
 			if (recorder != null) {
 				recorder.stop();
 				recorder.release();
 				recorder = null;
 				Log.i(LOG_TAG, "stop");
+				Log.i(LOG_TAG, "stop");
+				final String toastText = String.format(Locale.getDefault(),
+						getResources().getString(R.string.record_end),
+						writingFile);
+				writingFile = null;
+				Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
 			}
 		}
 	}
