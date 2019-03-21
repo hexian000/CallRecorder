@@ -40,8 +40,8 @@ public class CallReceiver extends BroadcastReceiver {
 			final MediaRecorder recorder = new MediaRecorder();
 			recorder.setAudioChannels(1);
 			recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_CALL);
-			recorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
-			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+			recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.HE_AAC);
 
 			File dir = new File(
 					Environment.getExternalStorageDirectory() + "/CallRecorder");
@@ -54,7 +54,7 @@ public class CallReceiver extends BroadcastReceiver {
 
 			final String file = dir.getAbsolutePath() + "/" +
 					new SimpleDateFormat("yyyy-MM-dd'T'HH_mm_ss.SSSZZ", Locale.getDefault())
-							.format(new Date()) + "_" + number + ".aac";
+							.format(new Date()) + "_" + number + ".m4a";
 			recorder.setOutputFile(file);
 
 			try {

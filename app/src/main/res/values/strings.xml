@@ -4,5 +4,5 @@
     <string name="no_permission">Permission is not granted. (are you installed as system app?)</string>
     <string name="record_now">Record Now</string>
     <string name="record_begin">Record begin</string>
-    <string name="record_end">Record saved to %s</string>
+    <string name="record_end">Recording saved to %s</string>
 </resources>

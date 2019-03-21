@@ -12,9 +12,9 @@ If you are a super user, "systemize" this by magisk is recommended.
 
 - Where is record files
 
-Call recording files is at \[External storage\]/CallRecorder/date+time+timezone+phoneNumber.aac
+Call recording files is at \[External storage\]/CallRecorder/date+time+timezone+phoneNumber.m4a
 
-Mic recording files is at \[External storage\]/Music/Recorder/date+time+timezone.aac
+Mic recording files is at \[External storage\]/Music/Recorder/date+time+timezone.m4a
 
 - But... why AAC?
 

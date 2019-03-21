@@ -34,8 +34,14 @@ public class MainActivity extends Activity {
 			"android.permission.RECORD_AUDIO",
 	};
 
-	private static MediaRecorder recorder = null;
-	private static String writingFile = null;
+	private MediaRecorder recorder = null;
+	private String writingFile = null;
+
+	@Override
+	protected void onPause() {
+		stopMicRecord();
+		super.onPause();
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,55 +82,62 @@ public class MainActivity extends Activity {
 				return;
 			}
 
-			recorder = new MediaRecorder();
-			recorder.setAudioChannels(1);
-			recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-			recorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
-			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-			recorder.setAudioSamplingRate(48000);
-			recorder.setAudioEncodingBitRate(192000);
-
-			File dir = new File(
-					Environment.getExternalStoragePublicDirectory(
-							Environment.DIRECTORY_MUSIC) + "/Recorder");
-			if (!dir.exists()) {
-				if (!dir.mkdirs()) {
-					Log.e(LOG_TAG, "cannot mkdirs: " + dir.getAbsolutePath());
-					return;
-				}
-			}
-
-			final String file = dir.getAbsolutePath() + "/" +
-					new SimpleDateFormat("yyyy-MM-dd'T'HH_mm_ss.SSSZZ", Locale.getDefault())
-							.format(new Date()) + ".aac";
-			recorder.setOutputFile(file);
-
-			try {
-				recorder.prepare();
-			} catch (IOException e) {
-				Log.e(LOG_TAG, "MediaRecorder.prepare()", e);
-			}
-			Log.i(LOG_TAG, "start: " + file);
-			try {
-				recorder.start();
-			} catch (Throwable ex) {
-				Log.e(LOG_TAG, "MediaRecorder.start()", ex);
-			}
-			writingFile = file;
-			Toast.makeText(this, R.string.record_begin, Toast.LENGTH_SHORT).show();
+			startMicRecord();
 		} else {
-			if (recorder != null) {
-				recorder.stop();
-				recorder.release();
-				recorder = null;
-				Log.i(LOG_TAG, "stop");
-				Log.i(LOG_TAG, "stop");
-				final String toastText = String.format(Locale.getDefault(),
-						getResources().getString(R.string.record_end),
-						writingFile);
-				writingFile = null;
-				Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
+			stopMicRecord();
+		}
+	}
+
+	private void startMicRecord() {
+		recorder = new MediaRecorder();
+		recorder.setAudioChannels(1);
+		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+		recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.HE_AAC);
+		recorder.setAudioSamplingRate(48000);
+		recorder.setAudioEncodingBitRate(192000);
+
+		File dir = new File(
+				Environment.getExternalStoragePublicDirectory(
+						Environment.DIRECTORY_MUSIC) + "/Recorder");
+		if (!dir.exists()) {
+			if (!dir.mkdirs()) {
+				Log.e(LOG_TAG, "cannot mkdirs: " + dir.getAbsolutePath());
+				return;
 			}
+		}
+
+		final String file = dir.getAbsolutePath() + "/" +
+				new SimpleDateFormat("yyyy-MM-dd'T'HH_mm_ss.SSSZZ", Locale.getDefault())
+						.format(new Date()) + ".m4a";
+		recorder.setOutputFile(file);
+
+		try {
+			recorder.prepare();
+		} catch (IOException e) {
+			Log.e(LOG_TAG, "MediaRecorder.prepare()", e);
+		}
+		Log.i(LOG_TAG, "start: " + file);
+		try {
+			recorder.start();
+		} catch (Throwable ex) {
+			Log.e(LOG_TAG, "MediaRecorder.start()", ex);
+		}
+		writingFile = file;
+		Toast.makeText(this, R.string.record_begin, Toast.LENGTH_SHORT).show();
+	}
+
+	private void stopMicRecord() {
+		if (recorder != null) {
+			recorder.stop();
+			recorder.release();
+			recorder = null;
+			Log.i(LOG_TAG, "stop");
+			final String toastText = String.format(Locale.getDefault(),
+					getResources().getString(R.string.record_end),
+					writingFile);
+			writingFile = null;
+			Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
 		}
 	}
 
