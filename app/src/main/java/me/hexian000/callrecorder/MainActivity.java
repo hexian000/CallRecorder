@@ -93,8 +93,7 @@ public class MainActivity extends Activity {
 		recorder.setAudioChannels(1);
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.HE_AAC);
-		recorder.setAudioSamplingRate(48000);
+		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 		recorder.setAudioEncodingBitRate(192000);
 
 		File dir = new File(

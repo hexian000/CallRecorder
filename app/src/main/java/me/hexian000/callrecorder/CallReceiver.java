@@ -41,7 +41,7 @@ public class CallReceiver extends BroadcastReceiver {
 			recorder.setAudioChannels(1);
 			recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_CALL);
 			recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.HE_AAC);
+			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 
 			File dir = new File(
 					Environment.getExternalStorageDirectory() + "/CallRecorder");
