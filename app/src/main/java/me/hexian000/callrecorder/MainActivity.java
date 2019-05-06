@@ -1,24 +1,16 @@
 package me.hexian000.callrecorder;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-
-import static me.hexian000.callrecorder.CallRecorder.LOG_TAG;
 
 public class MainActivity extends Activity {
 	private static final int PERMISSIONS_REQUEST_CODE = 0;
@@ -33,24 +25,35 @@ public class MainActivity extends Activity {
 			"android.permission.WRITE_EXTERNAL_STORAGE",
 			"android.permission.RECORD_AUDIO",
 	};
-
-	private MediaRecorder recorder = null;
-	private String writingFile = null;
-
-	@Override
-	protected void onPause() {
-		stopMicRecord();
-		super.onPause();
-	}
+	private CallRecorder app;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		app = (CallRecorder) getApplicationContext();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		update();
+		app.mainActivity = this;
+	}
+
+	@Override
+	protected void onPause() {
+		app.mainActivity = null;
+		super.onPause();
+	}
+
+	void update() {
 		final CallRecorder app = (CallRecorder) getApplicationContext();
-		final ToggleButton toggle = findViewById(R.id.toggleCallRecord);
-		toggle.setChecked(app.isEnabled());
+		final ToggleButton toggleCallRecord = findViewById(R.id.toggleCallRecord);
+		toggleCallRecord.setChecked(app.isEnabled());
+		final ToggleButton toggleMicRecord = findViewById(R.id.toggleMicRecord);
+		toggleMicRecord.setChecked(app.micRecordService != null);
 	}
 
 	public void ToggleCallRecord(View v) {
@@ -82,61 +85,11 @@ public class MainActivity extends Activity {
 				return;
 			}
 
-			startMicRecord();
+			final Intent intent = new Intent(getApplicationContext(), MicRecordService.class);
+			startForegroundService(intent);
 		} else {
-			stopMicRecord();
-		}
-	}
-
-	private void startMicRecord() {
-		recorder = new MediaRecorder();
-		recorder.setAudioChannels(1);
-		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-		recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-		recorder.setAudioEncodingBitRate(192000);
-
-		File dir = new File(
-				Environment.getExternalStoragePublicDirectory(
-						Environment.DIRECTORY_MUSIC) + "/Recorder");
-		if (!dir.exists()) {
-			if (!dir.mkdirs()) {
-				Log.e(LOG_TAG, "cannot mkdirs: " + dir.getAbsolutePath());
-				return;
-			}
-		}
-
-		final String file = dir.getAbsolutePath() + "/" +
-				new SimpleDateFormat("yyyy-MM-dd'T'HH_mm_ss.SSSZZ", Locale.getDefault())
-						.format(new Date()) + ".m4a";
-		recorder.setOutputFile(file);
-
-		try {
-			recorder.prepare();
-		} catch (IOException e) {
-			Log.e(LOG_TAG, "MediaRecorder.prepare()", e);
-		}
-		Log.i(LOG_TAG, "start: " + file);
-		try {
-			recorder.start();
-		} catch (Throwable ex) {
-			Log.e(LOG_TAG, "MediaRecorder.start()", ex);
-		}
-		writingFile = file;
-		Toast.makeText(this, R.string.record_begin, Toast.LENGTH_SHORT).show();
-	}
-
-	private void stopMicRecord() {
-		if (recorder != null) {
-			recorder.stop();
-			recorder.release();
-			recorder = null;
-			Log.i(LOG_TAG, "stop");
-			final String toastText = String.format(Locale.getDefault(),
-					getResources().getString(R.string.record_end),
-					writingFile);
-			writingFile = null;
-			Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
+			final Intent intent = new Intent(getApplicationContext(), MicRecordService.class);
+			stopService(intent);
 		}
 	}
 

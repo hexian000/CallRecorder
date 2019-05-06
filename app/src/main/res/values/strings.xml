@@ -5,4 +5,7 @@
     <string name="record_now">Record Now</string>
     <string name="record_begin">Record begin</string>
     <string name="record_end">Recording saved to %s</string>
+    <string name="notification_channel">Recording</string>
+    <string name="notification_ongoing">Recording from microphone</string>
+    <string name="notification_action_stop">Stop</string>
 </resources>
