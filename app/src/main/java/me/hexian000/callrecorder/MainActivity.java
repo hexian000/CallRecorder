@@ -21,6 +21,7 @@ public class MainActivity extends Activity {
 			Manifest.permission.RECORD_AUDIO,
 			Manifest.permission.READ_PHONE_STATE,
 			Manifest.permission.READ_CONTACTS,
+			Manifest.permission.READ_CALL_LOG,
 			"android.permission.READ_PRIVILEGED_PHONE_STATE",
 	};
 	private static final String[] RECORD_PERMISSIONS = new String[]{
