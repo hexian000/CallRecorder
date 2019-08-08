@@ -17,7 +17,6 @@ public class CallRecorder extends Application {
 	public MicRecordService micRecordService = null;
 	public MainActivity mainActivity = null;
 	public MediaRecorder mediaRecorder = null;
-	public String writingFile = null;
 
 	public boolean isEnabled() {
 		final Context context = getApplicationContext();

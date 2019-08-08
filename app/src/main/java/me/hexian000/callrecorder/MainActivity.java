@@ -1,5 +1,6 @@
 package me.hexian000.callrecorder;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,15 +16,16 @@ import java.util.List;
 public class MainActivity extends Activity {
 	private static final int PERMISSIONS_REQUEST_CODE = 0;
 	private static final String[] CALL_RECORD_PERMISSIONS = new String[]{
-			"android.permission.CAPTURE_AUDIO_OUTPUT",
+			Manifest.permission.CAPTURE_AUDIO_OUTPUT,
+			Manifest.permission.WRITE_EXTERNAL_STORAGE,
+			Manifest.permission.RECORD_AUDIO,
+			Manifest.permission.READ_PHONE_STATE,
+			Manifest.permission.READ_CONTACTS,
 			"android.permission.READ_PRIVILEGED_PHONE_STATE",
-			"android.permission.WRITE_EXTERNAL_STORAGE",
-			"android.permission.RECORD_AUDIO",
-			"android.permission.READ_PHONE_STATE",
 	};
 	private static final String[] RECORD_PERMISSIONS = new String[]{
-			"android.permission.WRITE_EXTERNAL_STORAGE",
-			"android.permission.RECORD_AUDIO",
+			Manifest.permission.WRITE_EXTERNAL_STORAGE,
+			Manifest.permission.RECORD_AUDIO,
 	};
 	private CallRecorder app;
 

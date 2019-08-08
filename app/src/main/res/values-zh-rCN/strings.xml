@@ -5,7 +5,7 @@
     <string name="no_permission">未获取权限。（是否已安装为系统app？）</string>
     <string name="record_now">现在录音</string>
     <string name="record_begin">录音开始</string>
-    <string name="record_end">录音已保存到 %s</string>
+    <string name="record_end">录音已保存</string>
     <string name="notification_channel">录音</string>
     <string name="notification_ongoing">正在录制麦克风</string>
     <string name="notification_action_stop">停止</string>
