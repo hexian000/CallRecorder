@@ -84,7 +84,9 @@ public class MicRecordService extends Service {
 	}
 
 	private void updateNotification() {
-		if (!started) return;
+		if (!started) {
+			return;
+		}
 
 		builder.setSubText(formatDuration(System.currentTimeMillis() - startTimeMillis));
 		notificationManager.notify(startId, builder.build());
@@ -119,7 +121,8 @@ public class MicRecordService extends Service {
 		Log.i(LOG_TAG, "start: " + fullPath);
 		try {
 			recorder.start();
-		} catch (Throwable ex) {
+			recorder.getMaxAmplitude();
+		} catch (Exception ex) {
 			throw new IOException("MediaRecorder.start()", ex);
 		}
 		writingFile = fullPath;
@@ -129,13 +132,11 @@ public class MicRecordService extends Service {
 	private void stopMicRecord() {
 		if (recorder != null) {
 			recorder.stop();
+			Log.i(LOG_TAG, "stop, maxAmplitude=" + recorder.getMaxAmplitude());
 			recorder.release();
 			recorder = null;
-			Log.i(LOG_TAG, "stop");
 
-			final String text = String.format(Locale.getDefault(),
-					getResources().getString(R.string.record_end),
-					writingFile);
+			final String text = getResources().getString(R.string.record_end);
 			writingFile = null;
 
 			final Notification.Builder builder = new Notification.Builder(app,
@@ -163,7 +164,9 @@ public class MicRecordService extends Service {
 			stopSelf();
 			return START_NOT_STICKY;
 		}
-		if (started) return START_NOT_STICKY;
+		if (started) {
+			return START_NOT_STICKY;
+		}
 
 		this.startId = startId;
 		try {

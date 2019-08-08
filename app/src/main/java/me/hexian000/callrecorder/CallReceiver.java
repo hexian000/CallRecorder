@@ -120,8 +120,9 @@ public class CallReceiver extends BroadcastReceiver {
 		for (int retry = 0; ; retry++) {
 			try {
 				recorder.start();
+				recorder.getMaxAmplitude();
 				break;
-			} catch (Throwable ex) {
+			} catch (Exception ex) {
 				Log.e(LOG_TAG, "MediaRecorder.start()", ex);
 			}
 			if (retry < 3) {
@@ -146,8 +147,8 @@ public class CallReceiver extends BroadcastReceiver {
 		if (recorder == null) {
 			return;
 		}
-		Log.i(LOG_TAG, "stop, maxAmplitude=" + recorder.getMaxAmplitude());
 		recorder.stop();
+		Log.i(LOG_TAG, "stop, maxAmplitude=" + recorder.getMaxAmplitude());
 		recorder.release();
 		app.mediaRecorder = null;
 		Toast.makeText(context, context.getResources().getString(R.string.record_end),
