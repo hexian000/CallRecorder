@@ -41,7 +41,6 @@ public class CallReceiver extends BroadcastReceiver {
 						ContactsContract.Data.DISPLAY_NAME));
 			}
 		}
-
 		return null;
 	}
 
@@ -52,6 +51,18 @@ public class CallReceiver extends BroadcastReceiver {
 		}
 		name += ".amr";
 		return name;
+	}
+
+	private static String makeFilePath(final Context context, final String number)
+			throws IOException {
+		final String dirPath = Utils.makePath(Paths.get(
+				Environment.getExternalStorageDirectory().getAbsolutePath(),
+				"CallRecorder"
+		).toString());
+		final ContentResolver resolver = context.getContentResolver();
+		final String displayName = getContactDisplayNameByNumber(resolver, number);
+		final String fileName = makeRecordingFileName(displayName, number);
+		return Paths.get(dirPath, fileName).toString();
 	}
 
 	@Override
@@ -73,12 +84,12 @@ public class CallReceiver extends BroadcastReceiver {
 
 		if (start) {
 			try {
-				filePath = prepareRecording(context, number);
+				filePath = makeFilePath(context, number);
 			} catch (Exception ex) {
 				Log.e(LOG_TAG, "fatal exception: ", ex);
 				return;
 			}
-			handler.postDelayed(this::tryStartRecording, 1000);
+			handler.postDelayed(this::tryStartRecording, 500);
 		} else {
 			try {
 				stopRecording();
@@ -86,17 +97,6 @@ public class CallReceiver extends BroadcastReceiver {
 				Log.e(LOG_TAG, "unexpected exception: ", ex);
 			}
 		}
-	}
-
-	private String prepareRecording(final Context context, final String number) throws IOException {
-		final String dirPath = Utils.makePath(Paths.get(
-				Environment.getExternalStorageDirectory().getAbsolutePath(),
-				"CallRecorder"
-		).toString());
-		final ContentResolver resolver = context.getContentResolver();
-		final String displayName = getContactDisplayNameByNumber(resolver, number);
-		final String fileName = makeRecordingFileName(displayName, number);
-		return Paths.get(dirPath, fileName).toString();
 	}
 
 	private void tryStartRecording() {
