@@ -52,7 +52,10 @@ public class MainActivity extends Activity {
 	}
 
 	void update() {
-		final CallRecorder app = (CallRecorder) getApplicationContext();
+		if (app.isEnabled() && checkPermissions(CALL_RECORD_PERMISSIONS).length > 0) {
+			app.setEnabled(false);
+		}
+
 		final ToggleButton toggleCallRecord = findViewById(R.id.toggleCallRecord);
 		toggleCallRecord.setChecked(app.isEnabled());
 		final ToggleButton toggleMicRecord = findViewById(R.id.toggleMicRecord);
@@ -60,7 +63,6 @@ public class MainActivity extends Activity {
 	}
 
 	public void ToggleCallRecord(View v) {
-		final CallRecorder app = (CallRecorder) getApplicationContext();
 		final ToggleButton toggle = (ToggleButton) v;
 		if (toggle.isChecked()) {
 			grantPermissions(checkPermissions(CALL_RECORD_PERMISSIONS));

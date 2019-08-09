@@ -8,15 +8,23 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.media.MediaRecorder;
-import android.util.Log;
 
 public class CallRecorder extends Application {
 	public static final String LOG_TAG = CallRecorder.class.getSimpleName();
 	public final static String CHANNEL_RECORDING = "recording";
 	public MicRecordService micRecordService = null;
 	public MainActivity mainActivity = null;
-	public MediaRecorder mediaRecorder = null;
+
+	static void createNotificationChannels(final NotificationManager manager, final Resources res) {
+		final NotificationChannel channel = new NotificationChannel(CHANNEL_RECORDING,
+				res.getString(R.string.notification_channel), NotificationManager.IMPORTANCE_LOW);
+		channel.setLockscreenVisibility(Notification.VISIBILITY_SECRET);
+		channel.enableLights(false);
+		channel.enableVibration(false);
+		channel.setSound(null, null);
+
+		manager.createNotificationChannel(channel);
+	}
 
 	public boolean isEnabled() {
 		final Context context = getApplicationContext();
@@ -34,24 +42,6 @@ public class CallRecorder extends Application {
 				enabled ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
 						PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
 				PackageManager.DONT_KILL_APP);
-
-		if (!enabled && mediaRecorder != null) {
-			mediaRecorder.stop();
-			mediaRecorder.release();
-			mediaRecorder = null;
-			Log.i(LOG_TAG, "stop due to disable");
-		}
-	}
-
-	static void createNotificationChannels(final NotificationManager manager, final Resources res) {
-		final NotificationChannel channel = new NotificationChannel(CHANNEL_RECORDING,
-				res.getString(R.string.notification_channel), NotificationManager.IMPORTANCE_LOW);
-		channel.setLockscreenVisibility(Notification.VISIBILITY_SECRET);
-		channel.enableLights(false);
-		channel.enableVibration(false);
-		channel.setSound(null, null);
-
-		manager.createNotificationChannel(channel);
 	}
 
 }
