@@ -70,6 +70,9 @@ public class CallReceiver extends BroadcastReceiver {
 		if (!TelephonyManager.ACTION_PHONE_STATE_CHANGED.equals(intent.getAction())) {
 			return;
 		}
+		if (!intent.hasExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)) {
+			return;
+		}
 
 		final String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
 		if (lastState.equals(state)) {
