@@ -93,17 +93,10 @@ public class CallReceiver extends BroadcastReceiver {
 				Environment.getExternalStorageDirectory().getAbsolutePath(),
 				"CallRecorder"
 		).toString());
-
-		return Paths.get(
-				dirPath,
-				makeRecordingFileName(
-						getContactDisplayNameByNumber(
-								context.getContentResolver(),
-								number
-						),
-						number
-				)
-		).toString();
+		final ContentResolver resolver = context.getContentResolver();
+		final String displayName = getContactDisplayNameByNumber(resolver, number);
+		final String fileName = makeRecordingFileName(displayName, number);
+		return Paths.get(dirPath, fileName).toString();
 	}
 
 	private void tryStartRecording() {
