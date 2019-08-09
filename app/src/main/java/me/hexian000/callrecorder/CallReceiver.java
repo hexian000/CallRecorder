@@ -89,7 +89,7 @@ public class CallReceiver extends BroadcastReceiver {
 				Log.e(LOG_TAG, "fatal exception: ", ex);
 				return;
 			}
-			handler.postDelayed(this::tryStartRecording, 500);
+			handler.post(this::tryStartRecording);
 		} else {
 			try {
 				stopRecording();
@@ -164,8 +164,10 @@ public class CallReceiver extends BroadcastReceiver {
 		} else {
 			Log.w(LOG_TAG, "stop, maxAmplitude=" + maxAmplitude);
 		}
+		recorder.reset();
 		recorder.release();
 		recorder = null;
-		Toast.makeText(context, context.getResources().getString(R.string.record_end), Toast.LENGTH_SHORT).show();
+		Toast.makeText(context, context.getResources().getString(R.string.record_end),
+				Toast.LENGTH_SHORT).show();
 	}
 }

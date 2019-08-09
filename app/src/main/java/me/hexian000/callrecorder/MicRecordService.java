@@ -51,16 +51,16 @@ public class MicRecordService extends Service {
 				stopRecIntent, PendingIntent.FLAG_ONE_SHOT);
 		startTimeMillis = System.currentTimeMillis();
 		builder.setContentText(getResources().getText(R.string.notification_ongoing))
-				.setSubText(formatDuration(0))
-				.setSmallIcon(R.drawable.ic_mic_black_24dp)
-				.setWhen(startTimeMillis)
-				.setOngoing(true)
-				.setOnlyAlertOnce(true)
-				.setVisibility(Notification.VISIBILITY_SECRET)
-				.addAction(new Notification.Action.Builder(
-						Icon.createWithResource(this, R.drawable.ic_stop_black_24dp),
-						getString(R.string.notification_action_stop),
-						stopRec).build());
+		       .setSubText(formatDuration(0))
+		       .setSmallIcon(R.drawable.ic_mic_black_24dp)
+		       .setWhen(startTimeMillis)
+		       .setOngoing(true)
+		       .setOnlyAlertOnce(true)
+		       .setVisibility(Notification.VISIBILITY_SECRET)
+		       .addAction(new Notification.Action.Builder(
+				       Icon.createWithResource(this, R.drawable.ic_stop_black_24dp),
+				       getString(R.string.notification_action_stop),
+				       stopRec).build());
 
 		CallRecorder.createNotificationChannels(notificationManager, getResources());
 		builder.setChannelId(CallRecorder.CHANNEL_RECORDING);
@@ -93,7 +93,7 @@ public class MicRecordService extends Service {
 	private String makeFilePath() throws IOException {
 		final String dirPath = Utils.makePath(Paths.get(
 				Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
-						.getAbsolutePath(), "Recorder").toString());
+				           .getAbsolutePath(), "Recorder").toString());
 		final String fileName = Utils.sanitizeFileName(Utils.nowISO8601() + ".m4a");
 		return Paths.get(dirPath, fileName).toString();
 	}
@@ -140,6 +140,7 @@ public class MicRecordService extends Service {
 		} else {
 			Log.w(LOG_TAG, "stop, maxAmplitude=" + maxAmplitude);
 		}
+		recorder.reset();
 		recorder.release();
 		recorder = null;
 
@@ -147,11 +148,11 @@ public class MicRecordService extends Service {
 		final Notification.Builder builder = new Notification.Builder(app,
 				CallRecorder.CHANNEL_RECORDING);
 		builder.setContentText(text)
-				.setStyle(new Notification.BigTextStyle().bigText(text))
-				.setSmallIcon(R.drawable.ic_mic_black_24dp)
-				.setWhen(System.currentTimeMillis())
-				.setVisibility(Notification.VISIBILITY_SECRET)
-				.setChannelId(CallRecorder.CHANNEL_RECORDING);
+		       .setStyle(new Notification.BigTextStyle().bigText(text))
+		       .setSmallIcon(R.drawable.ic_mic_black_24dp)
+		       .setWhen(System.currentTimeMillis())
+		       .setVisibility(Notification.VISIBILITY_SECRET)
+		       .setChannelId(CallRecorder.CHANNEL_RECORDING);
 
 		notificationManager.notify(startId, builder.build());
 	}
