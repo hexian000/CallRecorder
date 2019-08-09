@@ -117,6 +117,11 @@ public class MicRecordService extends Service {
 		final String fullPath = Paths.get(dir.getAbsolutePath(), fileName).toString();
 		recorder.setOutputFile(fullPath);
 
+		recorder.setOnErrorListener((mr, what, extra) ->
+				Log.e(LOG_TAG, "MediaRecorder.onError " + what + " " + extra));
+		recorder.setOnInfoListener((mr, what, extra) ->
+				Log.i(LOG_TAG, "MediaRecorder.onInfo " + what + " " + extra));
+
 		recorder.prepare();
 		Log.i(LOG_TAG, "start: " + fullPath);
 		try {
@@ -132,7 +137,12 @@ public class MicRecordService extends Service {
 	private void stopMicRecord() {
 		if (recorder != null) {
 			recorder.stop();
-			Log.i(LOG_TAG, "stop, maxAmplitude=" + recorder.getMaxAmplitude());
+			final int maxAmplitude = recorder.getMaxAmplitude();
+			if (maxAmplitude > 0) {
+				Log.i(LOG_TAG, "stop, maxAmplitude=" + maxAmplitude);
+			} else {
+				Log.w(LOG_TAG, "stop, maxAmplitude=" + maxAmplitude);
+			}
 			recorder.release();
 			recorder = null;
 
