@@ -9,7 +9,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 
-public class CallRecorder extends Application {
+class CallRecorder extends Application {
 	public static final String LOG_TAG = CallRecorder.class.getSimpleName();
 	public final static String CHANNEL_RECORDING = "recording";
 	public MicRecordService micRecordService = null;
@@ -43,5 +43,4 @@ public class CallRecorder extends Application {
 						PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
 				PackageManager.DONT_KILL_APP);
 	}
-
 }

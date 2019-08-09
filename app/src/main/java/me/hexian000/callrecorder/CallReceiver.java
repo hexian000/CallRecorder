@@ -14,26 +14,14 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.nio.file.Paths;
 
 import static me.hexian000.callrecorder.CallRecorder.LOG_TAG;
 
 public class CallReceiver extends BroadcastReceiver {
 	private static String lastState = "";
-	private static MediaRecorder mediaRecorder = null;
-
-	private static String sanitizeFileName(final String desiredName) {
-		return desiredName.replaceAll("[\\\\/:*?\"<>|]", "_");
-	}
-
-	private static String nowISO8601() {
-		return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZ", Locale.getDefault())
-				.format(new Date());
-	}
+	private static MediaRecorder recorder = null;
 
 	private static String getContactDisplayNameByNumber(final ContentResolver resolver,
 	                                                    final String number) {
@@ -69,45 +57,42 @@ public class CallReceiver extends BroadcastReceiver {
 
 		Log.d(LOG_TAG, "PHONE_STATE " + state + " " + number + " " + start);
 
-		try {
-			if (start) {
+		if (start) {
+			try {
 				startRecording(context, number);
-			} else {
-				stopRecording(context);
+			} catch (Exception ex) {
+				if (recorder != null) {
+					recorder.reset();
+					recorder.release();
+					recorder = null;
+				}
+				Log.e(LOG_TAG, "unexpected exception: ", ex);
 			}
-		} catch (Exception ex) {
-			Log.e(LOG_TAG, "unexpected exception: ", ex);
+		} else {
+			stopRecording(context);
 		}
 	}
 
-	private void startRecording(final Context context, final String number) {
-		if (mediaRecorder != null) {
+	private void startRecording(final Context context, final String number) throws IOException {
+		if (recorder != null) {
 			Log.w(LOG_TAG, "startRecording when already recording");
 			return;
 		}
 
-		mediaRecorder = new MediaRecorder();
-		mediaRecorder.setAudioChannels(1);
-		mediaRecorder.setAudioSource(MediaRecorder.AudioSource.VOICE_CALL);
-		mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.AMR_WB);
-		mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_WB);
+		recorder = new MediaRecorder();
+		recorder.setAudioChannels(1);
+		recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_CALL);
+		recorder.setOutputFormat(MediaRecorder.OutputFormat.AMR_WB);
+		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_WB);
 
-		final String dirPath;
-		{
-			final File dir = new File(
-					Environment.getExternalStorageDirectory() + "/CallRecorder");
-			if (!dir.exists()) {
-				if (!dir.mkdirs()) {
-					Log.e(LOG_TAG, "cannot mkdirs: " + dir.getAbsolutePath());
-					return;
-				}
-			}
-			dirPath = dir.getAbsolutePath();
-		}
+		final String dirPath = Utils.makePath(Paths.get(
+				Environment.getExternalStorageDirectory().getAbsolutePath(),
+				"CallRecorder"
+		).toString());
 
 		final String file;
 		{
-			String name = nowISO8601() + "_" + number;
+			String name = Utils.nowISO8601() + "_" + number;
 
 			final String contact = getContactDisplayNameByNumber(context.getContentResolver(),
 					number);
@@ -116,17 +101,17 @@ public class CallReceiver extends BroadcastReceiver {
 			}
 
 			name += ".amr";
-			file = dirPath + "/" + sanitizeFileName(name);
+			file = Paths.get(dirPath, Utils.sanitizeFileName(name)).toString();
 		}
-		mediaRecorder.setOutputFile(file);
+		recorder.setOutputFile(file);
 
-		mediaRecorder.setOnErrorListener((mr, what, extra) ->
+		recorder.setOnErrorListener((mr, what, extra) ->
 				Log.e(LOG_TAG, "MediaRecorder.onError " + what + " " + extra));
-		mediaRecorder.setOnInfoListener((mr, what, extra) ->
+		recorder.setOnInfoListener((mr, what, extra) ->
 				Log.i(LOG_TAG, "MediaRecorder.onInfo " + what + " " + extra));
 
 		try {
-			mediaRecorder.prepare();
+			recorder.prepare();
 		} catch (IOException e) {
 			Log.e(LOG_TAG, "MediaRecorder.prepare()", e);
 		}
@@ -134,8 +119,8 @@ public class CallReceiver extends BroadcastReceiver {
 		Log.i(LOG_TAG, "start: " + file);
 		for (int retry = 0; ; retry++) {
 			try {
-				mediaRecorder.start();
-				mediaRecorder.getMaxAmplitude();
+				recorder.start();
+				recorder.getMaxAmplitude();
 				break;
 			} catch (Exception ex) {
 				Log.e(LOG_TAG, "MediaRecorder.start()", ex);
@@ -144,7 +129,7 @@ public class CallReceiver extends BroadcastReceiver {
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException ex) {
-					Log.w(LOG_TAG, "Thread.sleep()", ex);
+					Log.w(LOG_TAG, "Interrupted", ex);
 					return;
 				}
 			} else {
@@ -156,19 +141,19 @@ public class CallReceiver extends BroadcastReceiver {
 	}
 
 	private void stopRecording(final Context context) {
-		if (mediaRecorder == null) {
+		if (recorder == null) {
 			Log.w(LOG_TAG, "stopRecording when not recording");
 			return;
 		}
-		mediaRecorder.stop();
-		final int maxAmplitude = mediaRecorder.getMaxAmplitude();
+		recorder.stop();
+		final int maxAmplitude = recorder.getMaxAmplitude();
 		if (maxAmplitude > 0) {
 			Log.i(LOG_TAG, "stop, maxAmplitude=" + maxAmplitude);
 		} else {
 			Log.w(LOG_TAG, "stop, maxAmplitude=" + maxAmplitude);
 		}
-		mediaRecorder.release();
-		mediaRecorder = null;
+		recorder.release();
+		recorder = null;
 		Toast.makeText(context, context.getResources().getString(R.string.record_end), Toast.LENGTH_SHORT).show();
 	}
 }

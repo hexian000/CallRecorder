@@ -14,11 +14,8 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 import static me.hexian000.callrecorder.CallRecorder.LOG_TAG;
@@ -26,7 +23,7 @@ import static me.hexian000.callrecorder.CallRecorder.LOG_TAG;
 public class MicRecordService extends Service {
 	private static final String ACTION_STOP = "stop";
 
-	private Handler handler = new Handler();
+	private final Handler handler = new Handler();
 
 	private NotificationManager notificationManager;
 	private Notification.Builder builder;
@@ -36,7 +33,6 @@ public class MicRecordService extends Service {
 	private long startTimeMillis;
 
 	private MediaRecorder recorder = null;
-	private String writingFile = null;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -95,6 +91,11 @@ public class MicRecordService extends Service {
 	}
 
 	private void startMicRecord() throws IOException {
+		if (recorder != null) {
+			Log.w(LOG_TAG, "startMicRecord when already recording");
+			return;
+		}
+
 		recorder = new MediaRecorder();
 		recorder.setAudioChannels(1);
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -103,18 +104,12 @@ public class MicRecordService extends Service {
 		recorder.setAudioSamplingRate(48000);
 		recorder.setAudioEncodingBitRate(192000);
 
-		final File dir = new File(Paths.get(Environment.
-						getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getAbsolutePath(),
-				"Recorder").toString());
-		if (!dir.exists()) {
-			if (!dir.mkdirs()) {
-				throw new IOException("cannot mkdirs: " + dir.getAbsolutePath());
-			}
-		}
+		final String dirPath = Utils.makePath(Paths.get(
+				Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
+						.getAbsolutePath(), "Recorder").toString());
 
-		final String fileName = new SimpleDateFormat("yyyy-MM-dd'T'HH_mm_ss.SSSZZ",
-				Locale.getDefault()).format(new Date()) + ".m4a";
-		final String fullPath = Paths.get(dir.getAbsolutePath(), fileName).toString();
+		final String fileName = Utils.sanitizeFileName(Utils.nowISO8601() + ".m4a");
+		final String fullPath = Paths.get(dirPath, fileName).toString();
 		recorder.setOutputFile(fullPath);
 
 		recorder.setOnErrorListener((mr, what, extra) ->
@@ -124,42 +119,38 @@ public class MicRecordService extends Service {
 
 		recorder.prepare();
 		Log.i(LOG_TAG, "start: " + fullPath);
-		try {
-			recorder.start();
-			recorder.getMaxAmplitude();
-		} catch (Exception ex) {
-			throw new IOException("MediaRecorder.start()", ex);
-		}
-		writingFile = fullPath;
+		recorder.start();
+		recorder.getMaxAmplitude();
 		Toast.makeText(this, R.string.record_begin, Toast.LENGTH_SHORT).show();
 	}
 
 	private void stopMicRecord() {
-		if (recorder != null) {
-			recorder.stop();
-			final int maxAmplitude = recorder.getMaxAmplitude();
-			if (maxAmplitude > 0) {
-				Log.i(LOG_TAG, "stop, maxAmplitude=" + maxAmplitude);
-			} else {
-				Log.w(LOG_TAG, "stop, maxAmplitude=" + maxAmplitude);
-			}
-			recorder.release();
-			recorder = null;
-
-			final String text = getResources().getString(R.string.record_end);
-			writingFile = null;
-
-			final Notification.Builder builder = new Notification.Builder(app,
-					CallRecorder.CHANNEL_RECORDING);
-			builder.setContentText(text)
-					.setStyle(new Notification.BigTextStyle().bigText(text))
-					.setSmallIcon(R.drawable.ic_mic_black_24dp)
-					.setWhen(System.currentTimeMillis())
-					.setVisibility(Notification.VISIBILITY_SECRET)
-					.setChannelId(CallRecorder.CHANNEL_RECORDING);
-
-			notificationManager.notify(startId, builder.build());
+		if (recorder == null) {
+			Log.w(LOG_TAG, "stopMicRecord when not recording");
+			return;
 		}
+
+		recorder.stop();
+		final int maxAmplitude = recorder.getMaxAmplitude();
+		if (maxAmplitude > 0) {
+			Log.i(LOG_TAG, "stop, maxAmplitude=" + maxAmplitude);
+		} else {
+			Log.w(LOG_TAG, "stop, maxAmplitude=" + maxAmplitude);
+		}
+		recorder.release();
+		recorder = null;
+
+		final String text = getResources().getString(R.string.record_end);
+		final Notification.Builder builder = new Notification.Builder(app,
+				CallRecorder.CHANNEL_RECORDING);
+		builder.setContentText(text)
+				.setStyle(new Notification.BigTextStyle().bigText(text))
+				.setSmallIcon(R.drawable.ic_mic_black_24dp)
+				.setWhen(System.currentTimeMillis())
+				.setVisibility(Notification.VISIBILITY_SECRET)
+				.setChannelId(CallRecorder.CHANNEL_RECORDING);
+
+		notificationManager.notify(startId, builder.build());
 	}
 
 	@Override
@@ -181,8 +172,13 @@ public class MicRecordService extends Service {
 		this.startId = startId;
 		try {
 			startMicRecord();
-		} catch (IOException e) {
-			Log.e(LOG_TAG, "MicRecordService.onStartCommand(...)", e);
+		} catch (Exception ex) {
+			if (recorder != null) {
+				recorder.reset();
+				recorder.release();
+				recorder = null;
+			}
+			Log.e(LOG_TAG, "MicRecordService.startMicRecord", ex);
 			stopSelf();
 			return START_NOT_STICKY;
 		}
