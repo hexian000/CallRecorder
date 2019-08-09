@@ -133,7 +133,7 @@ public class CallReceiver extends BroadcastReceiver {
 		}
 	}
 
-	private void startRecording() {
+	private void startRecording() throws IOException {
 		if (recorder != null) {
 			Log.w(LOG_TAG, "startRecording when already recording");
 			return;
@@ -151,11 +151,7 @@ public class CallReceiver extends BroadcastReceiver {
 		recorder.setOnInfoListener((mr, what, extra) ->
 				Log.i(LOG_TAG, "MediaRecorder.onInfo " + what + " " + extra));
 
-		try {
-			recorder.prepare();
-		} catch (IOException e) {
-			Log.e(LOG_TAG, "MediaRecorder.prepare()", e);
-		}
+		recorder.prepare();
 
 		Log.i(LOG_TAG, "start: " + filePath);
 		recorder.start();

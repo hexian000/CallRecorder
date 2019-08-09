@@ -90,6 +90,14 @@ public class MicRecordService extends Service {
 		handler.postDelayed(this::updateNotification, 1000);
 	}
 
+	private String makeFilePath() throws IOException {
+		final String dirPath = Utils.makePath(Paths.get(
+				Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
+						.getAbsolutePath(), "Recorder").toString());
+		final String fileName = Utils.sanitizeFileName(Utils.nowISO8601() + ".m4a");
+		return Paths.get(dirPath, fileName).toString();
+	}
+
 	private void startMicRecord() throws IOException {
 		if (recorder != null) {
 			Log.w(LOG_TAG, "startMicRecord when already recording");
@@ -104,12 +112,7 @@ public class MicRecordService extends Service {
 		recorder.setAudioSamplingRate(48000);
 		recorder.setAudioEncodingBitRate(192000);
 
-		final String dirPath = Utils.makePath(Paths.get(
-				Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
-						.getAbsolutePath(), "Recorder").toString());
-
-		final String fileName = Utils.sanitizeFileName(Utils.nowISO8601() + ".m4a");
-		final String fullPath = Paths.get(dirPath, fileName).toString();
+		final String fullPath = makeFilePath();
 		recorder.setOutputFile(fullPath);
 
 		recorder.setOnErrorListener((mr, what, extra) ->
