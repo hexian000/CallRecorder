@@ -174,8 +174,14 @@ public class MicRecordService extends Service {
 			startMicRecord();
 		} catch (Exception ex) {
 			if (recorder != null) {
-				recorder.reset();
-				recorder.release();
+				try {
+					recorder.reset();
+				} catch (Exception ignored) {
+				}
+				try {
+					recorder.release();
+				} catch (Exception ignored) {
+				}
 				recorder = null;
 			}
 			Log.e(LOG_TAG, "MicRecordService.startMicRecord", ex);
