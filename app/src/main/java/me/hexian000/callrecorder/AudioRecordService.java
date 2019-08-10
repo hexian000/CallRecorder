@@ -86,6 +86,7 @@ public class AudioRecordService extends Service {
 	}
 
 	private void notifyStop() {
+		handler.removeCallbacks(this::notifyUpdate);
 		final String text = getResources().getString(R.string.record_end);
 		final Notification.Builder builder = new Notification.Builder(app,
 				CallRecorder.CHANNEL_RECORDING);
@@ -100,6 +101,7 @@ public class AudioRecordService extends Service {
 	}
 
 	private void notifyCancel() {
+		handler.removeCallbacks(this::notifyUpdate);
 		notificationManager.cancel(startId);
 	}
 
