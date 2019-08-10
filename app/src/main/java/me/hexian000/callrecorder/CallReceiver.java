@@ -61,7 +61,7 @@ public class CallReceiver extends BroadcastReceiver {
 		).toString());
 		final ContentResolver resolver = context.getContentResolver();
 		final String displayName = getContactDisplayNameByNumber(resolver, number);
-		final String fileName = makeRecordingFileName(displayName, number);
+		final String fileName = Utils.sanitizeFileName(makeRecordingFileName(displayName, number));
 		return Paths.get(dirPath, fileName).toString();
 	}
 
