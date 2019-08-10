@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -103,12 +102,10 @@ public class AudioRecordService extends Service {
 				Log.i(LOG_TAG, "MediaRecorder.onInfo " + what + " " + extra));
 
 		recorder.prepare();
-		recorder.getMaxAmplitude();
 		Log.i(LOG_TAG, "start: " + filePath);
 		recorder.start();
 		startTimeMillis = System.currentTimeMillis();
-
-		Toast.makeText(this, R.string.record_begin, Toast.LENGTH_SHORT).show();
+		recorder.getMaxAmplitude();
 	}
 
 	private void stopRecording() {

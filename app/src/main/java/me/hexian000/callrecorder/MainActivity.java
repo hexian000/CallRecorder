@@ -90,6 +90,8 @@ public class MainActivity extends Activity {
 
 		final Intent intent = new Intent(getApplicationContext(), AudioRecordService.class);
 		startForegroundService(intent);
+
+		Toast.makeText(this, R.string.record_begin, Toast.LENGTH_SHORT).show();
 	}
 
 	@NonNull
