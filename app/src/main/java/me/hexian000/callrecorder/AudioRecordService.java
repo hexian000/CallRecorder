@@ -90,7 +90,6 @@ public class AudioRecordService extends Service {
 		final Notification.Builder builder = new Notification.Builder(app,
 				CallRecorder.CHANNEL_RECORDING);
 		builder.setContentText(text)
-		       .setStyle(new Notification.BigTextStyle().bigText(text))
 		       .setSmallIcon(R.drawable.ic_mic_black_24dp)
 		       .setWhen(System.currentTimeMillis())
 		       .setVisibility(Notification.VISIBILITY_SECRET)
@@ -130,7 +129,6 @@ public class AudioRecordService extends Service {
 		recorder.reset();
 		recorder.release();
 		recorder = null;
-		outputFile = null;
 	}
 
 	private void abortRecording() {
