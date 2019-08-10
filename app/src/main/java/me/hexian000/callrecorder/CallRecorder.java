@@ -41,7 +41,7 @@ public class CallRecorder extends Application {
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-		recorder.setAudioSamplingRate(48000);
+		recorder.setAudioSamplingRate(44100);
 		recorder.setAudioEncodingBitRate(192000);
 		return recorder;
 	}
