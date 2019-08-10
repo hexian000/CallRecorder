@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.io.File;
 import java.io.IOException;
 
 import static me.hexian000.callrecorder.CallRecorder.LOG_TAG;
@@ -20,6 +21,7 @@ import static me.hexian000.callrecorder.CallRecorder.LOG_TAG;
 public class AudioRecordService extends Service {
 	public static final String EXTRA_NUMBER = "number";
 	private static final String ACTION_STOP = "stop";
+	private static final String ACTION_CANCEL = "cancel";
 	private final Handler handler = new Handler();
 	private NotificationManager notificationManager;
 	private Notification.Builder builder;
@@ -27,7 +29,7 @@ public class AudioRecordService extends Service {
 	private int startId;
 	private long startTimeMillis;
 	private MediaRecorder recorder;
-	private String number;
+	private String outputFile;
 
 	public boolean isRecording() {
 		return recorder != null;
@@ -48,6 +50,12 @@ public class AudioRecordService extends Service {
 		stopRecIntent.setAction(ACTION_STOP);
 		final PendingIntent stopRec = PendingIntent.getForegroundService(app, 0,
 				stopRecIntent, PendingIntent.FLAG_ONE_SHOT);
+
+		final Intent cancelRecIntent = new Intent(app, AudioRecordService.class);
+		cancelRecIntent.setAction(ACTION_CANCEL);
+		final PendingIntent cancelRec = PendingIntent.getForegroundService(app, 0,
+				cancelRecIntent, PendingIntent.FLAG_ONE_SHOT);
+
 		builder.setContentText(getResources().getText(R.string.notification_ongoing))
 		       .setSubText(Utils.formatDuration(0))
 		       .setSmallIcon(R.drawable.ic_mic_black_24dp)
@@ -57,8 +65,10 @@ public class AudioRecordService extends Service {
 		       .setVisibility(Notification.VISIBILITY_SECRET)
 		       .addAction(new Notification.Action.Builder(
 				       Icon.createWithResource(this, R.drawable.ic_stop_black_24dp),
-				       getString(R.string.notification_action_stop),
-				       stopRec).build());
+				       getString(R.string.notification_action_stop), stopRec).build())
+		       .addAction(new Notification.Action.Builder(
+				       Icon.createWithResource(this, R.drawable.ic_delete_black_24dp),
+				       getString(R.string.notification_action_cancel), cancelRec).build());
 
 		CallRecorder.createNotificationChannels(notificationManager, getResources());
 		builder.setChannelId(CallRecorder.CHANNEL_RECORDING);
@@ -93,8 +103,12 @@ public class AudioRecordService extends Service {
 		notificationManager.notify(startId, builder.build());
 	}
 
-	private void startRecording(@NonNull final String filePath) throws IOException {
-		recorder.setOutputFile(filePath);
+	private void notifyCancel() {
+		notificationManager.cancel(startId);
+	}
+
+	private void startRecording() throws IOException {
+		recorder.setOutputFile(outputFile);
 
 		recorder.setOnErrorListener((mr, what, extra) ->
 				Log.e(LOG_TAG, "MediaRecorder.onError " + what + " " + extra));
@@ -102,7 +116,7 @@ public class AudioRecordService extends Service {
 				Log.i(LOG_TAG, "MediaRecorder.onInfo " + what + " " + extra));
 
 		recorder.prepare();
-		Log.i(LOG_TAG, "start: " + filePath);
+		Log.i(LOG_TAG, "start: " + outputFile);
 		recorder.start();
 		startTimeMillis = System.currentTimeMillis();
 		recorder.getMaxAmplitude();
@@ -119,11 +133,11 @@ public class AudioRecordService extends Service {
 		recorder.reset();
 		recorder.release();
 		recorder = null;
+		outputFile = null;
 	}
 
 	private void abortRecording() {
 		if (recorder != null) {
-			Log.w(LOG_TAG, "abort");
 			try {
 				recorder.reset();
 			} catch (Exception ignored) {
@@ -134,6 +148,13 @@ public class AudioRecordService extends Service {
 			}
 			recorder = null;
 		}
+		final File f = new File(outputFile);
+		if (f.exists()) {
+			if (!f.delete()) {
+				Log.e(LOG_TAG, "delete file failed: " + outputFile);
+			}
+		}
+		outputFile = null;
 	}
 
 	@Override
@@ -146,12 +167,14 @@ public class AudioRecordService extends Service {
 	private void onIntent(@NonNull final Intent intent) {
 		if (ACTION_STOP.equals(intent.getAction())) {
 			if (isRecording()) {
-				final String number = intent.getStringExtra(EXTRA_NUMBER);
-				if ((number == null && this.number == null) ||
-						(number != null && number.equals(this.number))) {
-					stopRecording();
-					notifyStop();
-				}
+				stopRecording();
+				notifyStop();
+			}
+			return;
+		} else if (ACTION_CANCEL.equals(intent.getAction())) {
+			if (isRecording()) {
+				abortRecording();
+				notifyCancel();
 			}
 			return;
 		}
@@ -159,15 +182,17 @@ public class AudioRecordService extends Service {
 			Log.w(LOG_TAG, "trying to start when busy");
 			return;
 		}
-		number = intent.getStringExtra(EXTRA_NUMBER);
+		final String number = intent.getStringExtra(EXTRA_NUMBER);
 
 		try {
 			if (number != null) { /* Call Recording */
 				recorder = CallRecorder.newCallRecorder();
-				startRecording(Utils.makeCallFilePath(this, number));
+				outputFile = Utils.makeCallFilePath(this, number);
+				startRecording();
 			} else {
 				recorder = CallRecorder.newMicRecorder();
-				startRecording(Utils.makeMicFilePath());
+				outputFile = Utils.makeMicFilePath();
+				startRecording();
 			}
 		} catch (Exception ex) {
 			abortRecording();
