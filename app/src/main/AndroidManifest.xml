@@ -22,7 +22,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <service android:name=".MicRecordService" />
+        <service android:name=".AudioRecordService" />
 
         <activity android:name=".MainActivity">
             <intent-filter>

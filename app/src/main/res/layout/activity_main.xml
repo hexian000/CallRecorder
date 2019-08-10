@@ -22,20 +22,13 @@
         android:layout_marginTop="8dp"
         android:onClick="ToggleCallRecord" />
 
-    <TextView
-        android:id="@+id/textView"
+    <Button
+        android:id="@+id/buttonMicRecord"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:onClick="OnMicRecord"
         android:text="@string/record_now" />
-
-    <ToggleButton
-        android:id="@+id/toggleMicRecord"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:onClick="ToggleMicRecord" />
 
 </LinearLayout>

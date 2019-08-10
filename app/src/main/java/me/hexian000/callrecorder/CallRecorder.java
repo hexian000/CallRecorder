@@ -8,12 +8,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.media.MediaRecorder;
 
 public class CallRecorder extends Application {
 	public static final String LOG_TAG = CallRecorder.class.getSimpleName();
 	public final static String CHANNEL_RECORDING = "recording";
-	public MicRecordService micRecordService = null;
-	public MainActivity mainActivity = null;
+	public AudioRecordService audioRecordService = null;
 
 	static void createNotificationChannels(final NotificationManager manager, final Resources res) {
 		final NotificationChannel channel = new NotificationChannel(CHANNEL_RECORDING,
@@ -24,6 +24,26 @@ public class CallRecorder extends Application {
 		channel.setSound(null, null);
 
 		manager.createNotificationChannel(channel);
+	}
+
+	static MediaRecorder newCallRecorder() {
+		final MediaRecorder recorder = new MediaRecorder();
+		recorder.setAudioChannels(1);
+		recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_CALL);
+		recorder.setOutputFormat(MediaRecorder.OutputFormat.AMR_WB);
+		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_WB);
+		return recorder;
+	}
+
+	static MediaRecorder newMicRecorder() {
+		final MediaRecorder recorder = new MediaRecorder();
+		recorder.setAudioChannels(1);
+		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+		recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+		recorder.setAudioSamplingRate(48000);
+		recorder.setAudioEncodingBitRate(192000);
+		return recorder;
 	}
 
 	public boolean isEnabled() {
@@ -42,5 +62,9 @@ public class CallRecorder extends Application {
 				enabled ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
 						PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
 				PackageManager.DONT_KILL_APP);
+	}
+
+	public boolean isRecording() {
+		return audioRecordService != null && audioRecordService.isRecording();
 	}
 }

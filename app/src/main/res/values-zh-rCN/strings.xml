@@ -6,7 +6,8 @@
     <string name="record_now">现在录音</string>
     <string name="record_begin">录音开始</string>
     <string name="record_end">录音已保存</string>
+    <string name="record_busy">录音繁忙，有其他录音正在进行中？</string>
     <string name="notification_channel">录音</string>
-    <string name="notification_ongoing">正在录制麦克风</string>
+    <string name="notification_ongoing">正在录制中</string>
     <string name="notification_action_stop">停止</string>
 </resources>

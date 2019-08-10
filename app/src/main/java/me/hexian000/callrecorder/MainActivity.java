@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -43,24 +44,20 @@ public class MainActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		update();
-		app.mainActivity = this;
 	}
 
 	@Override
 	protected void onPause() {
-		app.mainActivity = null;
 		super.onPause();
 	}
 
-	void update() {
+	private void update() {
 		if (app.isEnabled() && checkPermissions(CALL_RECORD_PERMISSIONS).length > 0) {
 			app.setEnabled(false);
 		}
 
 		final ToggleButton toggleCallRecord = findViewById(R.id.toggleCallRecord);
 		toggleCallRecord.setChecked(app.isEnabled());
-		final ToggleButton toggleMicRecord = findViewById(R.id.toggleMicRecord);
-		toggleMicRecord.setChecked(app.micRecordService != null);
 	}
 
 	public void ToggleCallRecord(View v) {
@@ -79,25 +76,24 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	public void ToggleMicRecord(View v) {
-		final ToggleButton toggle = (ToggleButton) v;
-		if (toggle.isChecked()) {
-			final String[] perms = checkPermissions(MIC_RECORD_PERMISSIONS);
-			if (perms.length > 0) {
-				toggle.setChecked(false);
-				grantPermissions(PERMISSIONS_REQUEST_MIC, perms);
-				return;
-			}
-
-			final Intent intent = new Intent(getApplicationContext(), MicRecordService.class);
-			startForegroundService(intent);
-		} else {
-			final Intent intent = new Intent(getApplicationContext(), MicRecordService.class);
-			stopService(intent);
+	public void OnMicRecord(View v) {
+		final String[] perms = checkPermissions(MIC_RECORD_PERMISSIONS);
+		if (perms.length > 0) {
+			grantPermissions(PERMISSIONS_REQUEST_MIC, perms);
+			return;
 		}
+
+		if (app.isRecording()) {
+			Toast.makeText(this, R.string.record_busy, Toast.LENGTH_LONG).show();
+			return;
+		}
+
+		final Intent intent = new Intent(getApplicationContext(), AudioRecordService.class);
+		startForegroundService(intent);
 	}
 
-	private String[] checkPermissions(final String[] desired) {
+	@NonNull
+	private String[] checkPermissions(@NonNull final String[] desired) {
 		final List<String> permissions = new ArrayList<>();
 		for (String perm : desired) {
 			if (checkSelfPermission(perm) != PackageManager.PERMISSION_GRANTED) {
@@ -109,7 +105,7 @@ public class MainActivity extends Activity {
 		return permissions.toArray(new String[]{});
 	}
 
-	private void grantPermissions(final int code, final String[] permissions) {
+	private void grantPermissions(final int code, @NonNull final String[] permissions) {
 		if (permissions.length > 0) {
 			requestPermissions(permissions, code);
 		}
@@ -132,9 +128,8 @@ public class MainActivity extends Activity {
 		}
 		break;
 		case PERMISSIONS_REQUEST_MIC: {
-			final ToggleButton toggle = findViewById(R.id.toggleMicRecord);
-			toggle.setChecked(true);
-			ToggleMicRecord(toggle);
+			final Button button = findViewById(R.id.buttonMicRecord);
+			OnMicRecord(button);
 		}
 		break;
 		}
