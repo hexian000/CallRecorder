@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Icon;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -63,11 +62,9 @@ public class AudioRecordService extends Service {
 		       .setOngoing(true)
 		       .setOnlyAlertOnce(true)
 		       .setVisibility(Notification.VISIBILITY_SECRET)
-		       .addAction(new Notification.Action.Builder(
-				       Icon.createWithResource(this, R.drawable.ic_stop_black_24dp),
+		       .addAction(new Notification.Action.Builder(null,
 				       getString(R.string.notification_action_stop), stopRec).build())
-		       .addAction(new Notification.Action.Builder(
-				       Icon.createWithResource(this, R.drawable.ic_delete_black_24dp),
+		       .addAction(new Notification.Action.Builder(null,
 				       getString(R.string.notification_action_cancel), cancelRec).build());
 
 		CallRecorder.createNotificationChannels(notificationManager, getResources());
