@@ -92,7 +92,7 @@ public class CallReceiver extends BroadcastReceiver {
 				Log.e(LOG_TAG, "fatal exception: ", ex);
 				return;
 			}
-			handler.post(this::tryStartRecording);
+			handler.postDelayed(this::tryStartRecording, 1000);
 		} else {
 			try {
 				stopRecording();
@@ -157,7 +157,6 @@ public class CallReceiver extends BroadcastReceiver {
 
 	private void stopRecording() {
 		if (recorder == null) {
-			Log.w(LOG_TAG, "stopRecording when not recording");
 			return;
 		}
 		recorder.stop();
