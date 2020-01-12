@@ -18,21 +18,21 @@ public class DeleteReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		final String path = intent.getStringExtra(EXTRA_PATH);
-		final int startId = intent.getIntExtra(EXTRA_START_ID, -1);
-		if (path == null || startId == -1) {
+		if (path == null) {
 			return;
 		}
-		final NotificationManager notificationManager =
-				(NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
 		try {
 			final File f = new File(path);
 			if (!f.delete()) {
 				Log.e(LOG_TAG, "delete file failed: " + path);
 				return;
 			}
+			final NotificationManager notificationManager =
+					(NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+			final int startId = intent.getIntExtra(EXTRA_START_ID, 0);
 			notificationManager.cancel(startId);
-		} catch (SecurityException ex) {
-			Log.e(LOG_TAG, "delete file exception: " + path, ex);
+		} catch (Exception ex) {
+			Log.e(LOG_TAG, "DeleteReceiver exception: " + path, ex);
 		}
 	}
 }
