@@ -154,15 +154,17 @@ public class AudioRecordService extends Service {
 			}
 			recorder = null;
 		}
-		try {
-			final File f = new File(outputFile);
-			if (!f.delete()) {
-				Log.e(LOG_TAG, "delete file failed: " + outputFile);
+		if (outputFile != null) {
+			try {
+				final File f = new File(outputFile);
+				if (!f.delete()) {
+					Log.e(LOG_TAG, "delete file failed: " + outputFile);
+				}
+			} catch (SecurityException ex) {
+				Log.e(LOG_TAG, "delete file exception: " + outputFile, ex);
 			}
-		} catch (SecurityException ex) {
-			Log.e(LOG_TAG, "delete file exception: " + outputFile, ex);
+			outputFile = null;
 		}
-		outputFile = null;
 	}
 
 	@Override
