@@ -14,13 +14,14 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 import static me.hexian000.callrecorder.CallRecorder.LOG_TAG;
 
 public class AudioRecordService extends Service {
 	public static final String EXTRA_NUMBER = "number";
 	private static final String ACTION_STOP = "stop";
-	private static final String ACTION_CANCEL = "cancel";
+	private static final String ACTION_DELETE = "delete";
 	private final Handler handler = new Handler();
 	private NotificationManager notificationManager;
 	private Notification.Builder builder;
@@ -51,7 +52,7 @@ public class AudioRecordService extends Service {
 				stopRecIntent, PendingIntent.FLAG_ONE_SHOT);
 
 		final Intent cancelRecIntent = new Intent(app, AudioRecordService.class);
-		cancelRecIntent.setAction(ACTION_CANCEL);
+		cancelRecIntent.setAction(ACTION_DELETE);
 		final PendingIntent cancelRec = PendingIntent.getForegroundService(app, 0,
 				cancelRecIntent, PendingIntent.FLAG_ONE_SHOT);
 
@@ -65,7 +66,7 @@ public class AudioRecordService extends Service {
 		       .addAction(new Notification.Action.Builder(null,
 				       getString(R.string.notification_action_stop), stopRec).build())
 		       .addAction(new Notification.Action.Builder(null,
-				       getString(R.string.notification_action_cancel), cancelRec).build());
+				       getString(R.string.notification_action_delete), cancelRec).build());
 
 		CallRecorder.createNotificationChannels(notificationManager, getResources());
 		builder.setChannelId(CallRecorder.CHANNEL_RECORDING);
@@ -87,15 +88,22 @@ public class AudioRecordService extends Service {
 
 	private void notifyStop() {
 		handler.removeCallbacks(this::notifyUpdate);
-		final String text = getResources().getString(R.string.record_end);
+		final Intent deleteIntent = new Intent(app, DeleteReceiver.class);
+		deleteIntent.putExtra(DeleteReceiver.EXTRA_PATH, outputFile);
+		final PendingIntent deleteFile = PendingIntent.getBroadcast(app, 0,
+				deleteIntent, PendingIntent.FLAG_ONE_SHOT);
+		final String fileName = Paths.get(outputFile).getFileName().toString();
 		final Notification.Builder builder = new Notification.Builder(app,
 				CallRecorder.CHANNEL_RECORDING);
-		builder.setContentText(text)
+		builder.setSubText(getResources().getString(R.string.record_end))
+		       .setContentText(fileName)
 		       .setSmallIcon(R.drawable.ic_mic_black_24dp)
 		       .setWhen(System.currentTimeMillis())
 		       .setVisibility(Notification.VISIBILITY_SECRET)
 		       .setChannelId(CallRecorder.CHANNEL_RECORDING)
-		       .setTimeoutAfter(10000);
+		       .setTimeoutAfter(60000)
+		       .addAction(new Notification.Action.Builder(null,
+				       getString(R.string.notification_action_delete), deleteFile).build());
 
 		notificationManager.notify(startId, builder.build());
 	}
@@ -145,11 +153,13 @@ public class AudioRecordService extends Service {
 			}
 			recorder = null;
 		}
-		final File f = new File(outputFile);
-		if (f.exists()) {
+		try {
+			final File f = new File(outputFile);
 			if (!f.delete()) {
 				Log.e(LOG_TAG, "delete file failed: " + outputFile);
 			}
+		} catch (SecurityException ex) {
+			Log.e(LOG_TAG, "delete file exception: " + outputFile, ex);
 		}
 		outputFile = null;
 	}
@@ -168,7 +178,7 @@ public class AudioRecordService extends Service {
 				notifyStop();
 			}
 			return;
-		} else if (ACTION_CANCEL.equals(intent.getAction())) {
+		} else if (ACTION_DELETE.equals(intent.getAction())) {
 			if (isRecording()) {
 				abortRecording();
 				notifyCancel();
