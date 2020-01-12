@@ -90,6 +90,7 @@ public class AudioRecordService extends Service {
 		handler.removeCallbacks(this::notifyUpdate);
 		final Intent deleteIntent = new Intent(app, DeleteReceiver.class);
 		deleteIntent.putExtra(DeleteReceiver.EXTRA_PATH, outputFile);
+		deleteIntent.putExtra(DeleteReceiver.EXTRA_START_ID, startId);
 		final PendingIntent deleteFile = PendingIntent.getBroadcast(app, 0,
 				deleteIntent, PendingIntent.FLAG_ONE_SHOT);
 		final String fileName = Paths.get(outputFile).getFileName().toString();
