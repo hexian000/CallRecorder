@@ -84,7 +84,7 @@ class Utils {
 			throws IOException {
 		final String dirPath = makePath(Paths.get(
 				Environment.getExternalStorageDirectory().getAbsolutePath(),
-				"CallRecorder"
+				"Recordings", "Call Recordings"
 		).toString());
 		final ContentResolver resolver = context.getContentResolver();
 		final String displayName = getContactDisplayNameByNumber(resolver, number);
@@ -96,7 +96,7 @@ class Utils {
 	static String makeMicFilePath() throws IOException {
 		final String dirPath = makePath(Paths.get(
 				Environment.getExternalStorageDirectory().getAbsolutePath(),
-				"CallRecorder", "MicRecords"
+				"Recordings", "Mic Recordings"
 		).toString());
 		final String fileName = sanitizeFileName(nowISO8601() + ".m4a");
 		return Paths.get(dirPath, fileName).toString();
