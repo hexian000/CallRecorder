@@ -9,8 +9,9 @@ import android.content.Intent;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.io.IOException;

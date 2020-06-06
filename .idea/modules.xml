@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CallRecorder.iml" filepath="$PROJECT_DIR$/CallRecorder.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CallRecorder.iml" filepath="$PROJECT_DIR$/CallRecorder.iml" group="CallRecorder" />
       <module fileurl="file://$PROJECT_DIR$/app/CallRecorder-app.iml" filepath="$PROJECT_DIR$/app/CallRecorder-app.iml" group="CallRecorder/app" />
       <module fileurl="file://$PROJECT_DIR$/StudioProjects-CallRecorder.iml" filepath="$PROJECT_DIR$/StudioProjects-CallRecorder.iml" group="CallRecorder" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="CallRecorder/app" />
     </modules>
   </component>
 </project>
