@@ -194,8 +194,9 @@ public class AudioRecordService extends Service {
 			Log.w(LOG_TAG, "trying to start when busy");
 			return;
 		}
-		final String number = intent.getStringExtra(EXTRA_NUMBER);
 
+		notifyStart();
+		final String number = intent.getStringExtra(EXTRA_NUMBER);
 		try {
 			if (number != null) { /* Call Recording */
 				recorder = CallRecorder.newCallRecorder();
@@ -206,11 +207,10 @@ public class AudioRecordService extends Service {
 			}
 			startRecording();
 		} catch (Exception ex) {
-			abortRecording();
 			Log.e(LOG_TAG, "AudioRecordService.startRecording", ex);
-			return;
+			abortRecording();
+			notifyCancel();
 		}
-		notifyStart();
 	}
 
 	@Override

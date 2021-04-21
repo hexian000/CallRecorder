@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CallRecorder.iml" filepath="$PROJECT_DIR$/CallRecorder.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/CallRecorder.iml" filepath="$PROJECT_DIR$/.idea/modules/CallRecorder.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/CallRecorder.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/CallRecorder.app.iml" />
     </modules>
   </component>
