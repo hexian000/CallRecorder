@@ -11,7 +11,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -176,6 +176,7 @@ public class AudioRecordService extends Service {
 	}
 
 	private void onIntent(@NonNull final Intent intent) {
+		Log.d(LOG_TAG, "Service action: " + intent.getAction());
 		if (ACTION_STOP.equals(intent.getAction())) {
 			if (isRecording()) {
 				stopRecording();
@@ -199,12 +200,11 @@ public class AudioRecordService extends Service {
 			if (number != null) { /* Call Recording */
 				recorder = CallRecorder.newCallRecorder();
 				outputFile = Utils.makeCallFilePath(this, number);
-				startRecording();
 			} else {
 				recorder = CallRecorder.newMicRecorder();
 				outputFile = Utils.makeMicFilePath();
-				startRecording();
 			}
+			startRecording();
 		} catch (Exception ex) {
 			abortRecording();
 			Log.e(LOG_TAG, "AudioRecordService.startRecording", ex);
