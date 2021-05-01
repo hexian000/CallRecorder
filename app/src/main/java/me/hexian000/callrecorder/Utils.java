@@ -94,9 +94,9 @@ class Utils {
 	}
 
 	@NonNull
-	static String makeMicFilePath() throws IOException {
+	static String makeMicFilePath(final Context context) throws IOException {
 		final String dirPath = makePath(Paths.get(
-				Environment.getExternalStorageDirectory().getAbsolutePath(),
+				context.getExternalFilesDir("Recordings").getAbsolutePath(),
 				"Microphone"
 		).toString());
 		final String fileName = sanitizeFileName(nowISO8601() + ".m4a");

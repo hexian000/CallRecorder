@@ -206,7 +206,7 @@ public class AudioRecordService extends AccessibilityService {
 				outputFile = Utils.makeCallFilePath(this, number);
 			} else {
 				recorder = CallRecorder.newMicRecorder();
-				outputFile = Utils.makeMicFilePath();
+				outputFile = Utils.makeMicFilePath(this);
 			}
 			startRecording();
 		} catch (Exception ex) {

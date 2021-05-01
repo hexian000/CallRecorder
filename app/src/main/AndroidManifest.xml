@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="me.hexian000.callrecorder">
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission

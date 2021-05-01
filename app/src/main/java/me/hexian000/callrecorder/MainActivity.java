@@ -21,14 +21,12 @@ public class MainActivity extends Activity {
 	private static final int PERMISSIONS_REQUEST_MIC = 1;
 	private static final String[] CALL_RECORD_PERMISSIONS = new String[]{
 			Manifest.permission.CAPTURE_AUDIO_OUTPUT,
-			Manifest.permission.WRITE_EXTERNAL_STORAGE,
 			Manifest.permission.RECORD_AUDIO,
 			Manifest.permission.READ_PHONE_STATE,
 			Manifest.permission.READ_CONTACTS,
 			Manifest.permission.READ_CALL_LOG,
 	};
 	private static final String[] MIC_RECORD_PERMISSIONS = new String[]{
-			Manifest.permission.WRITE_EXTERNAL_STORAGE,
 			Manifest.permission.RECORD_AUDIO,
 	};
 	private CallRecorder app;
@@ -90,7 +88,7 @@ public class MainActivity extends Activity {
 		}
 
 		final Intent intent = new Intent(getApplicationContext(), AudioRecordService.class);
-		startForegroundService(intent);
+		startService(intent);
 
 		Toast.makeText(this, R.string.record_begin, Toast.LENGTH_SHORT).show();
 	}
