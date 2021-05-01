@@ -39,9 +39,9 @@ public class CallReceiver extends BroadcastReceiver {
 				Toast.makeText(context, R.string.record_busy, Toast.LENGTH_LONG).show();
 				return;
 			}
-			context.startForegroundService(i);
 		} else {
-			context.stopService(i);
+			i.setAction(AudioRecordService.ACTION_STOP);
 		}
+		context.startService(i);
 	}
 }

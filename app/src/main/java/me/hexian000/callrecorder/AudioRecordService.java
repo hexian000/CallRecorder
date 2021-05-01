@@ -1,17 +1,16 @@
 package me.hexian000.callrecorder;
 
+import android.accessibilityservice.AccessibilityService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaRecorder;
 import android.os.Handler;
-import android.os.IBinder;
-import android.util.Log;
-
 import android.support.annotation.NonNull;
+import android.util.Log;
+import android.view.accessibility.AccessibilityEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,15 +18,15 @@ import java.nio.file.Paths;
 
 import static me.hexian000.callrecorder.CallRecorder.LOG_TAG;
 
-public class AudioRecordService extends Service {
+public class AudioRecordService extends AccessibilityService {
 	public static final String EXTRA_NUMBER = "number";
-	private static final String ACTION_STOP = "stop";
+	public static final String ACTION_STOP = "stop";
 	private static final String ACTION_DELETE = "delete";
 	private final Handler handler = new Handler();
 	private NotificationManager notificationManager;
 	private Notification.Builder builder;
 	private CallRecorder app;
-	private int startId;
+	private final int notificationId = 1;
 	private long startTimeMillis;
 	private MediaRecorder recorder;
 	private String outputFile;
@@ -37,8 +36,11 @@ public class AudioRecordService extends Service {
 	}
 
 	@Override
-	public IBinder onBind(Intent intent) {
-		throw new UnsupportedOperationException("Not supported");
+	public void onAccessibilityEvent(AccessibilityEvent event) {
+	}
+
+	@Override
+	public void onInterrupt() {
 	}
 
 	private void notifyStart() {
@@ -72,7 +74,7 @@ public class AudioRecordService extends Service {
 		CallRecorder.createNotificationChannels(notificationManager, getResources());
 		builder.setChannelId(CallRecorder.CHANNEL_RECORDING);
 
-		startForeground(startId, builder.build());
+		notificationManager.notify(notificationId, builder.build());
 		handler.postDelayed(this::notifyUpdate, 1000);
 	}
 
@@ -82,16 +84,17 @@ public class AudioRecordService extends Service {
 		}
 
 		builder.setSubText(Utils.formatDuration(System.currentTimeMillis() - startTimeMillis));
-		notificationManager.notify(startId, builder.build());
+		notificationManager.notify(notificationId, builder.build());
 
 		handler.postDelayed(this::notifyUpdate, 1000);
 	}
 
 	private void notifyStop() {
 		handler.removeCallbacks(this::notifyUpdate);
+		notificationManager.cancel(notificationId);
 		final Intent deleteIntent = new Intent(app, DeleteReceiver.class);
 		deleteIntent.putExtra(DeleteReceiver.EXTRA_PATH, outputFile);
-		deleteIntent.putExtra(DeleteReceiver.EXTRA_START_ID, startId);
+		deleteIntent.putExtra(DeleteReceiver.EXTRA_START_ID, notificationId);
 		final PendingIntent deleteFile = PendingIntent.getBroadcast(app, 0,
 				deleteIntent, PendingIntent.FLAG_ONE_SHOT);
 		final String fileName = Paths.get(outputFile).getFileName().toString();
@@ -107,12 +110,12 @@ public class AudioRecordService extends Service {
 		       .addAction(new Notification.Action.Builder(null,
 				       getString(R.string.notification_action_delete), deleteFile).build());
 
-		notificationManager.notify(startId, builder.build());
+		notificationManager.notify(notificationId, builder.build());
 	}
 
 	private void notifyCancel() {
 		handler.removeCallbacks(this::notifyUpdate);
-		notificationManager.cancel(startId);
+		notificationManager.cancel(notificationId);
 	}
 
 	private void startRecording() throws IOException {
@@ -215,7 +218,6 @@ public class AudioRecordService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		this.startId = startId;
 		onIntent(intent);
 		handler.post(this::release);
 		return START_NOT_STICKY;
