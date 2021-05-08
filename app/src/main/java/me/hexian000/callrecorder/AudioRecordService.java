@@ -175,6 +175,7 @@ public class AudioRecordService extends AccessibilityService {
 	@Override
 	public void onCreate() {
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		app = (CallRecorder) getApplicationContext();
 	}
 
 	private void onIntent(@NonNull final Intent intent) {
