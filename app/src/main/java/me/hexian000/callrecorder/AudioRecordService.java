@@ -91,8 +91,7 @@ public class AudioRecordService extends AccessibilityService {
 	}
 
 	private void notifyStop() {
-		handler.removeCallbacks(this::notifyUpdate);
-		notificationManager.cancel(notificationId);
+		notifyCancel();
 		final Intent deleteIntent = new Intent(app, DeleteReceiver.class);
 		deleteIntent.putExtra(DeleteReceiver.EXTRA_PATH, outputFile);
 		deleteIntent.putExtra(DeleteReceiver.EXTRA_NOTIFY_ID, notificationId);
@@ -117,6 +116,7 @@ public class AudioRecordService extends AccessibilityService {
 	private void notifyCancel() {
 		handler.removeCallbacks(this::notifyUpdate);
 		notificationManager.cancel(notificationId);
+		builder = null;
 	}
 
 	private void startRecording() throws IOException {
