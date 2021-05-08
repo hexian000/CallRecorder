@@ -1,6 +1,6 @@
 # Call Recorder
 
-A extremely lightweight call recorder for Android.
+A extremely lightweight call recorder for Android targeting a recent SDK version.
 
 This app MUST be installed as system app to grant necessary permissions properly.
 
@@ -8,13 +8,16 @@ If you are a ROM developer. Oh you know how to do it, of course.
 
 If you are a super user, "systemize" this by magisk is recommended.
 
+(Android 11)
+One more step to make call recording works: enable this app in Accessibility Settings.
+
 ### FAQ
 
 - Where is record files
 
-Call recording files is at \[External storage\]/CallRecorder/date+time+timezone+phoneNumber.m4a
+Call recording files is at \[External storage\]/Android/data/me.hexian000.callrecorder/files/Recordings/Voice Call/date+time+timezone+phoneNumber.m4a
 
-Mic recording files is at \[External storage\]/Music/Recorder/date+time+timezone.m4a
+Mic recording files is at \[External storage\]/Android/data/me.hexian000.callrecorder/files/Recordings/Microphone/date+time+timezone.m4a
 
 - But... why AAC?
 
