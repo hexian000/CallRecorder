@@ -68,6 +68,11 @@ public class MainActivity extends Activity {
 				grantPermissions(PERMISSIONS_REQUEST_CALL, perms);
 				return;
 			}
+			if (!app.isAccessServiceEnabled()) {
+				toggle.setChecked(false);
+				Toast.makeText(this, R.string.no_accessservice, Toast.LENGTH_SHORT).show();
+				return;
+			}
 
 			app.setEnabled(true);
 		} else {
@@ -82,15 +87,8 @@ public class MainActivity extends Activity {
 			return;
 		}
 
-		if (app.isRecording()) {
-			Toast.makeText(this, R.string.record_busy, Toast.LENGTH_LONG).show();
-			return;
-		}
-
 		final Intent intent = new Intent(getApplicationContext(), AudioRecordService.class);
 		startService(intent);
-
-		Toast.makeText(this, R.string.record_begin, Toast.LENGTH_SHORT).show();
 	}
 
 	@NonNull

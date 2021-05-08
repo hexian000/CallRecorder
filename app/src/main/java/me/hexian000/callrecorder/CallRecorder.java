@@ -9,11 +9,11 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.media.MediaRecorder;
+import android.provider.Settings;
 
 public class CallRecorder extends Application {
 	public static final String LOG_TAG = CallRecorder.class.getSimpleName();
 	public final static String CHANNEL_RECORDING = "recording";
-	public AudioRecordService audioRecordService = null;
 
 	static void createNotificationChannels(final NotificationManager manager, final Resources res) {
 		final NotificationChannel channel = new NotificationChannel(CHANNEL_RECORDING,
@@ -64,7 +64,11 @@ public class CallRecorder extends Application {
 				PackageManager.DONT_KILL_APP);
 	}
 
-	public boolean isRecording() {
-		return audioRecordService != null && audioRecordService.isRecording();
+	public boolean isAccessServiceEnabled() {
+		String prefString = Settings.Secure.getString(getContentResolver(),
+				Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+
+		return prefString != null && prefString.contains(
+				getPackageName() + "/" + AudioRecordService.class.getName());
 	}
 }

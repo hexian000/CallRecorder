@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -94,7 +95,7 @@ public class AudioRecordService extends AccessibilityService {
 		notificationManager.cancel(notificationId);
 		final Intent deleteIntent = new Intent(app, DeleteReceiver.class);
 		deleteIntent.putExtra(DeleteReceiver.EXTRA_PATH, outputFile);
-		deleteIntent.putExtra(DeleteReceiver.EXTRA_START_ID, notificationId);
+		deleteIntent.putExtra(DeleteReceiver.EXTRA_NOTIFY_ID, notificationId);
 		final PendingIntent deleteFile = PendingIntent.getBroadcast(app, 0,
 				deleteIntent, PendingIntent.FLAG_ONE_SHOT);
 		final String fileName = Paths.get(outputFile).getFileName().toString();
@@ -174,8 +175,6 @@ public class AudioRecordService extends AccessibilityService {
 	@Override
 	public void onCreate() {
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		app = (CallRecorder) getApplicationContext();
-		app.audioRecordService = this;
 	}
 
 	private void onIntent(@NonNull final Intent intent) {
@@ -195,6 +194,7 @@ public class AudioRecordService extends AccessibilityService {
 		}
 		if (isRecording()) {
 			Log.w(LOG_TAG, "trying to start when busy");
+			Toast.makeText(this, R.string.record_busy, Toast.LENGTH_LONG).show();
 			return;
 		}
 
@@ -214,19 +214,15 @@ public class AudioRecordService extends AccessibilityService {
 			abortRecording();
 			notifyCancel();
 		}
+		if (number == null) { /* Mic Recording */
+			Toast.makeText(this, R.string.record_begin, Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		onIntent(intent);
-		handler.post(this::release);
-		return START_NOT_STICKY;
-	}
-
-	private void release() {
-		if (!isRecording()) {
-			stopSelf();
-		}
+		return START_STICKY;
 	}
 
 	@Override
@@ -235,6 +231,5 @@ public class AudioRecordService extends AccessibilityService {
 			stopRecording();
 			notifyStop();
 		}
-		app.audioRecordService = null;
 	}
 }

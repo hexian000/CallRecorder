@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import static me.hexian000.callrecorder.CallRecorder.LOG_TAG;
 
@@ -34,12 +33,7 @@ public class CallReceiver extends BroadcastReceiver {
 		final CallRecorder app = (CallRecorder) context.getApplicationContext();
 		final Intent i = new Intent(app, AudioRecordService.class);
 		i.putExtra(AudioRecordService.EXTRA_NUMBER, number);
-		if (start) {
-			if (app.isRecording()) {
-				Toast.makeText(context, R.string.record_busy, Toast.LENGTH_LONG).show();
-				return;
-			}
-		} else {
+		if (!start) {
 			i.setAction(AudioRecordService.ACTION_STOP);
 		}
 		context.startService(i);

@@ -12,7 +12,7 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 import static me.hexian000.callrecorder.CallRecorder.LOG_TAG;
 
 public class DeleteReceiver extends BroadcastReceiver {
-	public static final String EXTRA_START_ID = "startId";
+	public static final String EXTRA_NOTIFY_ID = "notificationId";
 	public static final String EXTRA_PATH = "path";
 
 	@Override
@@ -29,8 +29,8 @@ public class DeleteReceiver extends BroadcastReceiver {
 			}
 			final NotificationManager notificationManager =
 					(NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-			final int startId = intent.getIntExtra(EXTRA_START_ID, 0);
-			notificationManager.cancel(startId);
+			final int notificationId = intent.getIntExtra(EXTRA_NOTIFY_ID, 0);
+			notificationManager.cancel(notificationId);
 		} catch (Exception ex) {
 			Log.e(LOG_TAG, "DeleteReceiver exception: " + path, ex);
 		}
