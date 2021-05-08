@@ -51,7 +51,8 @@ public class MainActivity extends Activity {
 	}
 
 	private void update() {
-		if (app.isEnabled() && checkPermissions(CALL_RECORD_PERMISSIONS).length > 0) {
+		if (checkPermissions(CALL_RECORD_PERMISSIONS).length > 0 ||
+				!app.isAccessServiceEnabled()) {
 			app.setEnabled(false);
 		}
 
