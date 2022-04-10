@@ -45,11 +45,6 @@ public class MainActivity extends Activity {
 		update();
 	}
 
-	@Override
-	protected void onPause() {
-		super.onPause();
-	}
-
 	private void update() {
 		if (checkPermissions(CALL_RECORD_PERMISSIONS).length > 0 ||
 				!app.isAccessServiceEnabled()) {
@@ -81,7 +76,7 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	public void OnMicRecord(View v) {
+	public void OnMicRecord() {
 		final String[] perms = checkPermissions(MIC_RECORD_PERMISSIONS);
 		if (perms.length > 0) {
 			grantPermissions(PERMISSIONS_REQUEST_MIC, perms);
@@ -129,7 +124,7 @@ public class MainActivity extends Activity {
 		break;
 		case PERMISSIONS_REQUEST_MIC: {
 			final Button button = findViewById(R.id.buttonMicRecord);
-			OnMicRecord(button);
+			OnMicRecord();
 		}
 		break;
 		}

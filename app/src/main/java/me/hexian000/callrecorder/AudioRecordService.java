@@ -96,7 +96,7 @@ public class AudioRecordService extends AccessibilityService {
 		deleteIntent.putExtra(DeleteReceiver.EXTRA_PATH, outputFile);
 		deleteIntent.putExtra(DeleteReceiver.EXTRA_NOTIFY_ID, notificationId);
 		final PendingIntent deleteFile = PendingIntent.getBroadcast(app, 0,
-				deleteIntent, PendingIntent.FLAG_ONE_SHOT);
+				deleteIntent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 		final String fileName = Paths.get(outputFile).getFileName().toString();
 		final Notification.Builder builder = new Notification.Builder(app,
 				CallRecorder.CHANNEL_RECORDING);
